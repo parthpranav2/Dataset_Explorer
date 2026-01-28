@@ -1,4 +1,4 @@
-# 📂 Dataset Structure Analyzer
+# 📂 Dataset Explorer
 
 This repository contains a Python toolkit designed to generate comprehensive text-based documentation of large dataset structures that cannot be directly analyzed by LLMs due to their size.
 
