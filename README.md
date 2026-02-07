@@ -1,50 +1,74 @@
-# 📂 Dataset Explorer
+# 📂 Dataset Explorer (Geoscience & Engineering Edition)
 
 This repository contains a Python toolkit designed to generate comprehensive text-based documentation of large dataset structures that cannot be directly analyzed by LLMs due to their size.
 
 ## Project Goal
 
-The main objective is to create **telescopic hierarchy visualizations** of complex datasets—whether stored as directories or nested ZIP files—and save them as lightweight `.txt` files that can be easily shared, versioned, or fed into LLMs for context understanding.
+The main objective is to create **telescopic hierarchy visualizations** of complex datasets and save them as lightweight `.txt` files. This edition is specifically optimized for **Petroleum Engineering and Geoscience** workflows.
 
 ### The Problem
-Large datasets (especially in machine learning, GIS, or research domains) often contain:
-- Hundreds or thousands of files
-- Nested directory structures
-- Compressed archives (ZIPs within ZIPs)
-- Mixed file types scattered across multiple levels
-
-**You can't just "show" this structure to an LLM or collaborator—it's too large to upload and too complex to describe manually.**
+Large subsurface datasets often contain thousands of files with domain-specific extensions (.segy, .las, .petrel) that general-purpose file explorers cannot describe meaningfully.
 
 ### Our Solution
-Generate a **complete structural snapshot** as a text file, including:
-- Visual tree representation with intuitive icons (📁, 🗜️)
-- File metadata (size, type, modification date)
-- Extension statistics and size summaries
-- Support for exploring ZIP contents without extraction
-- Batch processing for multiple datasets
+A **Zero Truncation Extraction** system. Instead of just listing filenames, the tool peers inside the headers of technical files to extract physical parameters (depths, coordinates, sensor metadata), providing a "structural snapshot" that carries geological context.
+
+## 🛠️ Advanced Subsurface Support
+
+The toolkit features specialized logic for over **110+ extensions**. Below are the key supported formats:
+
+### 🛢️ Petroleum & Well Engineering
+| Extension | Description | Extraction Focus |
+| :--- | :--- | :--- |
+| `.las` / `.dlis` | Log ASCII / Binary | Well headers, curve mnemonics, depth intervals. |
+| `.well` / `.wtg` | Well Geometry | Casing points, hole diameters, equipment specs. |
+| `.witsml` | Drilling Data | Real-time rig sensor parameters and timestamps. |
+| `.dev` | Deviation Surveys | MD, TVD, Azimuth, and Inclination stats. |
+
+### 🌎 Geoscience & Seismic Interpretation
+| Extension | Description | Extraction Focus |
+| :--- | :--- | :--- |
+| `.segy` / `.sgy` | Seismic Data | EBCDIC header scraping, sample rates, byte orders. |
+| `.hrz` / `.horizon`| Seismic Horizons | Interpretation density, Z-range (ms vs. meters). |
+| `.fault` | Fault Sticks | Fault names, vertical reach, geometry complexity. |
+| `.petrel` | Petrel Projects | Software version, CRS mapping, unit systems. |
+| `.dim` / `.safe` | Sentinel / SNAP | Satellite mission ID, polarization, acquisition date. |
+| `.jp2` / `.sid` | Geo-Rasters | Coordinate systems (CRS), spatial resolution. |
+
+### 📊 Data Science & Machine Learning
+| Extension | Description | Extraction Focus |
+| :--- | :--- | :--- |
+| `.npy` / `.npz` | NumPy Arrays | Array shape, dtype, and numerical distribution. |
+| `.pb` / `.h5` | ML Models | Signatures, tensor geometry, Keras metadata. |
+| `.netcdf` | Scientific Data | Global attributes, coordinate variables, units. |
+| `.csv` / `.json` | Structured Data | Column headers, row counts, key-value samples. |
+
+### 📄 Academic & Documentation
+| Extension | Description | Extraction Focus |
+| :--- | :--- | :--- |
+| `.docx` / `.pptx` | MS Office | Author, revision history, table/image counts. |
+| `.tex` / `.bib` | LaTeX / BibTeX | Math environments, packages, citation keys. |
+| `.md` | Markdown | Heading hierarchy, code blocks, link density. |
+
+
 
 ## Features
 
-✅ **Deep ZIP Exploration** - Recursively analyzes nested ZIP files without extracting them  
-✅ **Rich Metadata** - Shows file sizes, types, and modification dates  
-✅ **Extension Analytics** - Generates statistical summaries of file types and their cumulative sizes  
-✅ **Batch Processing** - Automatically processes multiple datasets in one go  
-✅ **Clean Filtering** - Ignores system files (`__MACOSX`, `.DS_Store`, `__pycache__`)  
-✅ **Jupyter-Friendly** - Designed for interactive notebook workflows  
+✅ **Deep ZIP Exploration** - Recursively analyzes nested ZIPs without extraction.  
+✅ **Zero Truncation Metadata** - Extracts units, CRS, and ranges for technical files.  
+✅ **Extension Analytics** - Generates statistical summaries of file types and sizes.  
+✅ **LLM-Ready Context** - Produces lightweight text reports for easy AI analysis.  
+✅ **Batch Processing** - Automatically documents multiple datasets in one run.  
 
 ## Dataset Structure Example
-```
-Animals
-├── 📁 Herbivorous
-│   ├── 📁 Cow
-│   │   ├── 📄 Diet.csv {Size: 2.3MB, Type: CSV, Modified: 2024-12-15}
-│   │   ├── 📄 Dimensions.xlsx {Size: 890KB, Type: XLSX, Modified: 2024-12-10}
-│   │   ├── 📄 Weight.json {Size: 156KB, Type: JSON, Modified: 2024-12-12}
-│   │   ├── 📁 Body_attributes
-│   │   │   ├── 🗜️ Bones.zip
-│   │   │   │   ├── 📄 femur.stl {Size: 4.5MB, Modified: 2024-11-20}
-│   │   │   │   └── 📄 skull.obj {Size: 3.2MB, Modified: 2024-11-20}
-```
+```text
+📂 Oil_Field_Alpha
+├── 📁 Seismic
+│   ├── 📄 Survey_3D.sgy {Size: 2.4GB, Type: SEGY, SampleRate: 4ms}
+│   └── 📄 Top_Reservoir.horizon {Size: 12MB, Nodes: 45k, Domain: Time}
+├── 📁 Well_Logs
+│   ├── 📄 Well_01.las {Size: 5MB, Curves: [GR, NPHI, RHOB, DT]}
+│   └── 🗜️ Core_Photos.zip
+│       └── 📄 Core_Sample_A1.jp2 {Res: 10cm, CRS: UTM45N}
 
 ## How It Works: A 3-Step Workflow
 
