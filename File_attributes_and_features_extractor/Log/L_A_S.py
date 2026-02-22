@@ -1,5 +1,6 @@
 import sys
 import os
+import textwrap
 
 # --- RIGOROUS ENVIRONMENT PROTOCOL ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -15,10 +16,10 @@ except ImportError:
     lasio = None
 # -------------------------------------
 
-def extract(file_path):
+def extract(file_path, indent_level=""):
     """
-    Exhaustively explores .las well log files.
-    Zero truncation: identifies well headers, depth range, and curve names.
+    Exhaustively explores .las files with intelligent line wrapping.
+    Prevents the branching structure from being cut or misaligned.
     """
     if not lasio:
         return "Error: lasio library not found in venv."
@@ -26,26 +27,32 @@ def extract(file_path):
     try:
         las = lasio.read(file_path)
         
-        # 1. Well Metadata
+        # 1. Metadata Extraction
         well_name = las.well.WELL.value if 'WELL' in las.well else "Unknown"
         uwi = las.well.UWI.value if 'UWI' in las.well else "N/A"
-        
-        # 2. Depth Constraints
+        company = las.well.COMP.value if 'COMP' in las.well else "N/A"
         start = las.well.STRT.value
         stop = las.well.STOP.value
         units = las.well.STRT.unit
         
-        # 3. Curve Mnemonics
-        curves = [c.mnemonic for c in las.curves]
+        # 2. Curve Mnemonic Processing
+        all_curves = [c.mnemonic for c in las.curves]
+        curve_raw_text = ", ".join(all_curves)
         
+        # 3. Intelligent Wrapping
+        # We assume a standard width of 80 chars for the curves section
+        # The prefix ensures the vertical tree lines are maintained on wrapped lines
+        wrapper = textwrap.TextWrapper(width=80, 
+                                       subsequent_indent=indent_level + " " * 16)
+        wrapped_curves = wrapper.fill(f"Available Logs: {curve_raw_text}")
+
         output = [
             f"Type: Log ASCII Standard (.las)",
-            f"Well: {well_name} (UWI: {uwi})",
+            f"Well: {well_name} | Company: {company}",
+            f"UWI: {uwi}",
             f"Interval: {start} - {stop} {units}",
-            f"Curve Count: {len(curves)}",
-            "Available Logs:",
-            f"  - " + (", ".join(curves[:8]) if curves else "None"),
-            f"  " + (f"...and {len(curves)-8} more" if len(curves) > 8 else "")
+            f"Total Curves: {len(all_curves)}",
+            wrapped_curves
         ]
 
         return "\n".join(output)
